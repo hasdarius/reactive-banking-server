@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDate;
+
 @RestController
 @RequestMapping("/transactions")
 public class TransactionController {
@@ -17,9 +19,20 @@ public class TransactionController {
         this.transactionService = transactionService;
     }
 
-    @GetMapping
+    @GetMapping()
     public Flux<Transaction> getAllTransactions() {
         return transactionService.getAllTransactions();
+    }
+    @GetMapping(path = "{accountNumber}/all")
+    public Flux<Transaction> getAllTransactionsByAccountNumber(@PathVariable("accountNumber") String accountNumber) {
+        return transactionService.getTransactionsByAccountNumber(accountNumber);
+    }
+
+    @GetMapping(path = "{accountNumber}")
+    public Flux<Transaction> getAllTransactionsByAccountNumberBetween(@PathVariable("accountNumber") String accountNumber,
+                                                                      @RequestParam("from") LocalDate from,
+                                                                      @RequestParam("to") LocalDate to ) {
+        return transactionService.getAllByAccountNumberAndTransactionDateBetween(accountNumber, from, to);
     }
 
     @PostMapping
@@ -27,6 +40,9 @@ public class TransactionController {
         return transactionService.createTransaction(transaction);
     }
 
-    // Add other controller methods as needed
+    @DeleteMapping(path = "{id}")
+    public Mono<Void> delete(@PathVariable("id") Long id) {
+        return transactionService.deleteTransaction(id);
+    }
 }
 

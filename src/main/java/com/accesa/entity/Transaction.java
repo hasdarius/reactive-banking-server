@@ -26,8 +26,6 @@ public class Transaction {
     Double withdrawalAmount;
     @Column("deposit_amount")
     Double depositAmount;
-    @Column("balance_amount")
-    Double balanceAmount;
 }
 
 
