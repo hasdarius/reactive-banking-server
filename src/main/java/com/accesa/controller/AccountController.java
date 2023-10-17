@@ -1,5 +1,6 @@
 package com.accesa.controller;
 
+import com.accesa.controller.validation.AccountContainsMoneyException;
 import com.accesa.entity.Account;
 import com.accesa.service.AccountService;
 import org.springframework.http.ResponseEntity;
@@ -16,40 +17,27 @@ public class AccountController {
         this.accountService = accountService;
     }
 
-    @PostMapping
-    public Mono<Account> createAccount(@RequestBody Account account) {
-        return accountService.createAccount(account);
-    }
-
     @GetMapping
     public Flux<Account> getAllAccounts() {
         return accountService.getAllAccounts();
     }
 
     @GetMapping("/{accountNumber}")
-    public Mono<ResponseEntity<Account>> getAccountById(@PathVariable String accountNumber) {
-        return accountService.getAccountById(accountNumber)
-                .map(ResponseEntity::ok)
-                .defaultIfEmpty(ResponseEntity.notFound().build());
+    public Mono<Account> getAccountByAccountNumber(@PathVariable String accountNumber) {
+        return accountService.getAccountByAccountNumber(accountNumber);
     }
 
-    @PutMapping("/{accountNumber}")
-    public Mono<ResponseEntity<Account>> updateAccount(
-            @PathVariable String accountNumber,
-            @RequestBody Account updatedAccount) {
-        return accountService.getAccountById(accountNumber)
-                .flatMap(existingAccount -> {
-                    updatedAccount.setAccountNumber(existingAccount.getAccountNumber());
-                    return accountService.updateAccount(updatedAccount);
-                })
-                .map(ResponseEntity::ok)
-                .defaultIfEmpty(ResponseEntity.notFound().build());
+    @PostMapping
+    public Mono<ResponseEntity<String>> createAccount(@RequestBody Account account) {
+        return accountService
+                .createAccount(account)
+                .then(Mono.just(ResponseEntity.ok().build()));
     }
 
     @DeleteMapping("/{accountNumber}")
-    public Mono<ResponseEntity<Void>> deleteAccount(@PathVariable String accountNumber) {
+    public Mono<ResponseEntity<String>> deleteAccount(@PathVariable String accountNumber) {
         return accountService.deleteAccount(accountNumber)
-                .then(Mono.just(ResponseEntity.ok().<Void>build()))
-                .onErrorReturn(ResponseEntity.notFound().build());
+                .then(Mono.just(ResponseEntity.ok().<String>build()))
+                .onErrorResume(AccountContainsMoneyException.class, error -> Mono.just(ResponseEntity.badRequest().body(error.getMessage())));
     }
 }

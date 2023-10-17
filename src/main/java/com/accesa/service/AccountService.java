@@ -1,5 +1,6 @@
 package com.accesa.service;
 
+import com.accesa.controller.validation.AccountContainsMoneyException;
 import com.accesa.entity.Account;
 import com.accesa.repository.AccountRepository;
 import com.accesa.repository.TransactionRepository;
@@ -27,8 +28,8 @@ public class AccountService {
         return accountRepository.findAll();
     }
 
-    public Mono<Account> getAccountById(String accountNumber) {
-        return accountRepository.findById(accountNumber);
+    public Mono<Account> getAccountByAccountNumber(String accountNumber) {
+        return accountRepository.findByAccountNumber(accountNumber);
     }
 
     public Mono<Account> updateAccount(Account updatedAccount) {
@@ -37,8 +38,16 @@ public class AccountService {
 
     @Transactional
     public Mono<Void> deleteAccount(String accountNumber) {
-        return accountRepository.findById(accountNumber)
-                .flatMap(account -> transactionRepository.deleteAllByAccountNumber(accountNumber)
-                        .then(accountRepository.deleteById(accountNumber)));
+        return accountRepository
+                .findByAccountNumber(accountNumber)
+                .flatMap(account -> getDeleteAccountMono(accountNumber, account));
+    }
+
+    private Mono<Void> getDeleteAccountMono(String accountNumber, Account account) {
+        if (account.getTotalBalance() != 0)
+            return Mono.error(new AccountContainsMoneyException());
+        return transactionRepository
+                .deleteAllByAccountNumber(accountNumber)
+                .then(accountRepository.deleteById(account.getId()));
     }
 }

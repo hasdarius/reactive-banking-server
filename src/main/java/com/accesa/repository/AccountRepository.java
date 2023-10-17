@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
 
 @Repository
-public interface AccountRepository extends ReactiveCrudRepository<Account, String> {
+public interface AccountRepository extends ReactiveCrudRepository<Account, Long> {
     Mono<Account> findByAccountNumber(String accountNumber);
+    Mono<Void> deleteByAccountNumber(String accountNumber);
 }
