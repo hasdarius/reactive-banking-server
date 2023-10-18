@@ -1,6 +1,5 @@
 package com.accesa.controller;
 
-import com.accesa.controller.validation.AccountContainsMoneyException;
 import com.accesa.controller.validation.AccountNotFoundException;
 import com.accesa.entity.Transaction;
 import com.accesa.service.TransactionService;
@@ -28,7 +27,7 @@ public class TransactionController {
         return transactionService.getAllTransactions();
     }
 
-    @GetMapping(path = "{accountNumber}/all")
+    @GetMapping(path = "all/{accountNumber}")
     public Flux<Transaction> getAllTransactionsByAccountNumber(@PathVariable("accountNumber") String accountNumber) {
         return transactionService.getTransactionsByAccountNumber(accountNumber);
     }
@@ -41,17 +40,18 @@ public class TransactionController {
     }
 
     @PostMapping
-    public Mono<ResponseEntity<String>> createTransaction(@RequestBody Transaction transaction) {
-        return transactionService.createTransaction(transaction)
-                .then(Mono.just(ResponseEntity.ok().<String>build()))
-                .onErrorResume(AccountNotFoundException.class, error -> Mono.just(ResponseEntity.badRequest().body(error.getMessage())));
+    public Mono<ResponseEntity<Object>> createTransaction(@RequestBody Transaction transaction) {
+        return transactionService
+                .createTransaction(transaction)
+                .then(Mono.just(ResponseEntity.ok().build()))
+                .onErrorResume(AccountNotFoundException.class, error -> Mono.just(ResponseEntity.notFound().build()));
     }
 
     @DeleteMapping(path = "{id}")
     public Mono<ResponseEntity<String>> delete(@PathVariable("id") Long id) {
-        return transactionService.deleteTransaction(id)
-                .then(Mono.just(ResponseEntity.ok().<String>build()))
-                .onErrorResume(AccountContainsMoneyException.class, error -> Mono.just(ResponseEntity.badRequest().body(error.getMessage())));
+        return transactionService
+                .deleteTransaction(id)
+                .then(Mono.just(ResponseEntity.ok().build()));
     }
 }
 

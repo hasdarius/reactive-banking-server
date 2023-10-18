@@ -21,14 +21,12 @@ public class Account {
     private Long id;
     @Column("account_number")
     private String accountNumber;
-    @Column("total_balance")
-    private double totalBalance;
+    @Column("account_holder")
+    private String accountHolder;
     @Transient
     @JsonIgnore
     @MappedCollection(idColumn = "account_number")
     private List<Transaction> transactions;
-
-    // Constructors, getters, and setters
 }
 
 

@@ -1,7 +1,6 @@
 package com.accesa.service;
 
 import com.accesa.controller.validation.AccountNotFoundException;
-import com.accesa.entity.Account;
 import com.accesa.entity.Transaction;
 import com.accesa.repository.AccountRepository;
 import com.accesa.repository.TransactionRepository;
@@ -12,14 +11,12 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
-import java.util.concurrent.locks.ReentrantLock;
 
 @Service
 public class TransactionService {
 
     private final TransactionRepository transactionRepository;
     private final AccountRepository accountRepository;
-    private final ReentrantLock accountLock = new ReentrantLock();
 
     @Autowired
     public TransactionService(TransactionRepository transactionRepository, AccountRepository accountRepository) {
@@ -35,7 +32,7 @@ public class TransactionService {
     public Mono<Transaction> createTransaction(Transaction transaction) {
         return accountRepository
                 .findByAccountNumber(transaction.getAccountNumber())
-                .flatMap(account -> getTransactionMono(transaction, account))
+                .flatMap(account -> transactionRepository.save(transaction))
                 .switchIfEmpty(Mono.error(new AccountNotFoundException()));
     }
 
@@ -49,20 +46,6 @@ public class TransactionService {
 
     public Mono<Void> deleteTransaction(Long id) {
         return transactionRepository.deleteById(id);
-    }
-
-    private Mono<Transaction> getTransactionMono(Transaction transaction, Account account) {
-        accountLock.lock();
-        try {
-            double amountUpdated = transaction.getDepositAmount() != null ? transaction.getDepositAmount() : -transaction.getWithdrawalAmount();
-            account.setTotalBalance(account.getTotalBalance() + amountUpdated);
-
-            return accountRepository
-                    .save(account)
-                    .then(transactionRepository.save(transaction));
-        } finally {
-            accountLock.unlock();
-        }
     }
 }
 

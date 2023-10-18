@@ -10,7 +10,7 @@ import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
-@Table(name = "transactions")
+@Table(name = "transaction")
 public class Transaction {
     @Id
     Long id;
@@ -20,8 +20,8 @@ public class Transaction {
     LocalDate transactionDate;
     @Column("transaction_details")
     String transactionDetails;
-    @Column("value_date")
-    LocalDate valueDate;
+    @Column("processed_date")
+    LocalDate processedDate;
     @Column("withdrawal_amount")
     Double withdrawalAmount;
     @Column("deposit_amount")
