@@ -5,9 +5,11 @@ import com.accesa.entity.Transaction;
 import com.accesa.repository.AccountRepository;
 import com.accesa.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
@@ -24,8 +26,11 @@ public class TransactionService {
         this.accountRepository = accountRepository;
     }
 
-    public Flux<Transaction> getAllTransactions() {
-        return transactionRepository.findAll();
+    public Mono<Page<Transaction>> getAllTransactions(Pageable pageable) {
+        return transactionRepository.findAllBy(pageable)
+                .collectList()
+                .zipWith(transactionRepository.count())
+                .map(tuple -> new PageImpl<>(tuple.getT1(), pageable,tuple.getT2()));
     }
 
     @Transactional
@@ -36,12 +41,23 @@ public class TransactionService {
                 .switchIfEmpty(Mono.error(new AccountNotFoundException()));
     }
 
-    public Flux<Transaction> getTransactionsByAccountNumber(String accountNumber) {
-        return transactionRepository.findAllByAccountNumber(accountNumber);
+    public Mono<Page<Transaction>> getTransactionsByAccountNumber(String accountNumber, Pageable pageable) {
+        return transactionRepository
+                .findAllByAccountNumber(accountNumber, pageable)
+                .collectList()
+                .zipWith(transactionRepository.countByAccountNumber(accountNumber))
+                .map(tuple -> new PageImpl<>(tuple.getT1(), pageable,tuple.getT2()));
     }
 
-    public Flux<Transaction> getAllByAccountNumberAndTransactionDateBetween(String accountNumber, LocalDate from, LocalDate to) {
-        return transactionRepository.findAllByAccountNumberAndTransactionDateBetween(accountNumber, from, to);
+    public Mono<Page<Transaction>> getAllByAccountNumberAndTransactionDateBetween(String accountNumber,
+                                                                            LocalDate from,
+                                                                            LocalDate to,
+                                                                            Pageable pageable) {
+        return transactionRepository
+                .findAllByAccountNumberAndTransactionDateBetween(accountNumber, from, to, pageable)
+                .collectList()
+                .zipWith(transactionRepository.countByAccountNumberAndTransactionDateBetween(accountNumber, from, to))
+                .map(tuple -> new PageImpl<>(tuple.getT1(), pageable,tuple.getT2()));
     }
 
     public Mono<Void> deleteTransaction(Long id) {

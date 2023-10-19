@@ -5,9 +5,10 @@ import com.accesa.controller.validation.AccountContainsMoneyException;
 import com.accesa.controller.validation.AccountNotFoundException;
 import com.accesa.entity.Account;
 import com.accesa.service.AccountService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -20,8 +21,8 @@ public class AccountController {
     }
 
     @GetMapping
-    public Flux<Account> getAllAccounts() {
-        return accountService.getAllAccounts();
+    public Mono<Page<Account>> getAllAccounts(Pageable pageable) {
+        return accountService.getAllAccounts(pageable);
     }
 
     @GetMapping("/number/{accountNumber}")
@@ -30,8 +31,8 @@ public class AccountController {
     }
 
     @GetMapping("/holder/{accountHolder}")
-    public Flux<Account> getAllAccountsByAccountHolder(@PathVariable String accountHolder) {
-        return accountService.getAllAccountsByAccountHolder(accountHolder);
+    public Mono<Page<Account>> getAllAccountsByAccountHolder(@PathVariable String accountHolder, Pageable pageable) {
+        return accountService.getAllAccountsByAccountHolder(accountHolder, pageable);
     }
 
     @GetMapping(path = "/balance/number/{accountNumber}")

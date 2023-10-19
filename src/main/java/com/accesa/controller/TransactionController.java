@@ -4,9 +4,10 @@ import com.accesa.controller.validation.AccountNotFoundException;
 import com.accesa.entity.Transaction;
 import com.accesa.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
@@ -23,20 +24,21 @@ public class TransactionController {
     }
 
     @GetMapping()
-    public Flux<Transaction> getAllTransactions() {
-        return transactionService.getAllTransactions();
+    public Mono<Page<Transaction>> getAllTransactions(Pageable pageable) {
+        return transactionService.getAllTransactions(pageable);
     }
 
     @GetMapping(path = "all/{accountNumber}")
-    public Flux<Transaction> getAllTransactionsByAccountNumber(@PathVariable("accountNumber") String accountNumber) {
-        return transactionService.getTransactionsByAccountNumber(accountNumber);
+    public Mono<Page<Transaction>> getAllTransactionsByAccountNumber(@PathVariable("accountNumber") String accountNumber, Pageable pageable) {
+        return transactionService.getTransactionsByAccountNumber(accountNumber, pageable);
     }
 
     @GetMapping(path = "{accountNumber}")
-    public Flux<Transaction> getAllTransactionsByAccountNumberBetween(@PathVariable("accountNumber") String accountNumber,
+    public Mono<Page<Transaction>> getAllTransactionsByAccountNumberBetween(@PathVariable("accountNumber") String accountNumber,
                                                                       @RequestParam("from") LocalDate from,
-                                                                      @RequestParam("to") LocalDate to) {
-        return transactionService.getAllByAccountNumberAndTransactionDateBetween(accountNumber, from, to);
+                                                                      @RequestParam("to") LocalDate to,
+                                                                      Pageable pageable) {
+        return transactionService.getAllByAccountNumberAndTransactionDateBetween(accountNumber, from, to, pageable);
     }
 
     @PostMapping
