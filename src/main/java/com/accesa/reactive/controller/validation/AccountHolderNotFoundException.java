@@ -1,4 +1,4 @@
-package com.accesa.controller.validation;
+package com.accesa.reactive.controller.validation;
 
 public class AccountHolderNotFoundException extends AccountException {
     public AccountHolderNotFoundException() {

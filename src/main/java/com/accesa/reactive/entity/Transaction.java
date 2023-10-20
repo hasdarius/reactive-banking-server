@@ -1,4 +1,4 @@
-package com.accesa.entity;
+package com.accesa.reactive.entity;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

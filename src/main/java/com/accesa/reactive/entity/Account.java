@@ -1,4 +1,4 @@
-package com.accesa.entity;
+package com.accesa.reactive.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;

@@ -1,6 +1,6 @@
-package com.accesa.repository;
+package com.accesa.reactive.repository;
 
-import com.accesa.entity.Transaction;
+import com.accesa.reactive.entity.Transaction;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Repository;

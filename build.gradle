@@ -30,6 +30,20 @@ dependencies {
     testImplementation 'io.projectreactor:reactor-test'
 }
 
+bootJar {
+    manifest {
+        attributes 'Start-Class': 'com.accesa.reactive.ReactiveBankingServerApplication'
+    }
+
+    manifest {
+        attributes 'Main-Class': 'org.springframework.boot.loader.PropertiesLauncher'
+    }
+}
+
+jar {
+    enabled = false
+}
+
 tasks.named('test') {
     useJUnitPlatform()
 }

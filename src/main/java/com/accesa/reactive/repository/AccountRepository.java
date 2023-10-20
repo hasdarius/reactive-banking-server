@@ -1,6 +1,6 @@
-package com.accesa.repository;
+package com.accesa.reactive.repository;
 
-import com.accesa.entity.Account;
+import com.accesa.reactive.entity.Account;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import org.springframework.stereotype.Repository;

@@ -1,4 +1,4 @@
-package com.accesa;
+package com.accesa.reactive;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
