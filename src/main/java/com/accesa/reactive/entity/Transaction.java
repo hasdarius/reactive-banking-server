@@ -1,4 +1,4 @@
-package com.accesa.entity;
+package com.accesa.reactive.entity;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,7 +10,7 @@ import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
-@Table(name = "transactions")
+@Table(name = "transaction")
 public class Transaction {
     @Id
     Long id;
@@ -20,14 +20,12 @@ public class Transaction {
     LocalDate transactionDate;
     @Column("transaction_details")
     String transactionDetails;
-    @Column("value_date")
-    LocalDate valueDate;
+    @Column("processed_date")
+    LocalDate processedDate;
     @Column("withdrawal_amount")
     Double withdrawalAmount;
     @Column("deposit_amount")
     Double depositAmount;
-    @Column("balance_amount")
-    Double balanceAmount;
 }
 
 
